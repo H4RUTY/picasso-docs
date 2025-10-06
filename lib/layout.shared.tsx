@@ -20,10 +20,11 @@ export function baseOptions(): BaseLayoutProps {
           >
             <circle cx={12} cy={12} r={12} fill="currentColor" />
           </svg>
-          My App
+          Picasso Docs
         </>
       ),
     },
+    githubUrl: 'https://github.com',
     // see https://fumadocs.dev/docs/ui/navigation/links
     links: [],
   };
