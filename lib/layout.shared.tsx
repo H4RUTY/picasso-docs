@@ -16,8 +16,7 @@ export function baseOptions(): BaseLayoutProps {
         </>
       ),
     },
-    githubUrl: 'https://github.com',
-    // see https://fumadocs.dev/docs/ui/navigation/links
+    githubUrl: 'https://github.com/H4RUTY/picasso-docs',
     links: [],
   };
 }
