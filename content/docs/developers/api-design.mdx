@@ -12,6 +12,22 @@ title: 'REST API 仕様書'
 
 ---
 
+## 0. 設計思想
+
+本 API は「**state.json を唯一の真実（Single Source of Truth）とする**」ことを基本方針とします。
+すべての状態はこのファイルを通じて管理・共有され、サーバ・クライアント間で一貫して扱われます。
+
+- **状態の一元管理**
+
+  - ゲームの状態はすべて `state.json` に集約し、サーバが正として扱う。
+  - 更新系 API（`capture`, `analyze`, `next`, `advance`, `end`など）は、更新後の `state.json` 全体を返す。
+
+- **フロントエンドとの関係**
+  - フロントは `state.json` のコピーを保持し、UI 表示用に随時更新する。
+  - API 呼び出し後、返却された最新の `state.json` を反映して同期を保ち、サーバと同一の状態を再現する。
+
+---
+
 ## 1. ディレクトリ構成
 
 ```text
@@ -35,7 +51,7 @@ title: 'REST API 仕様書'
 ```
 
 - `gameId` は `YYYYMMDD-HHMMSS` 形式。
-- `games/`{`gameId`}/state.json` がそのゲームの SOT（source of truth）。
+- `games/:gameId/state.json` がそのゲームの SOT（source of truth）。
 
 ---
 
@@ -89,23 +105,22 @@ title: 'REST API 仕様書'
 
 ## 3. API 一覧（概要）
 
-| メソッド | パス                         | 概要                                                             |
-| -------- | ---------------------------- | ---------------------------------------------------------------- |
-| POST     | `/games`                     | 新規ゲーム作成（gameId 発行、state.json 生成）                   |
-| GET      | `/games`                     | 過去ゲーム一覧取得（gameId, startedAt, result, summary）         |
-| GET      | `/games/:gameId`             | ゲーム状態取得（state.json を返す）                              |
-| PATCH    | `/games/:gameId`             | state.json の部分更新（管理用）                                  |
-| POST     | `/games/:gameId/slide`       | ロール紙を指定長さ（mm）だけ送る                                 |
-| POST     | `/games/:gameId/capture`     | Web カメラで撮影し turn-N.png を保存 / state.json 更新（turn++） |
-| POST     | `/games/:gameId/analyze`     | 画像解析 → 単語推測 → 勝敗判定 → AI 次単語生成                   |
-| POST     | `/games/:gameId/plot`        | SVG→G-code 変換 → プロッタ送信（非同期。202 Accepted）           |
-| GET      | `/games/:gameId/plot/:jobId` | 描画ジョブステータス取得（任意）                                 |
-| POST     | `/games/:gameId/hint`        | 単語のヒント生成                                                 |
-| POST     | `/games/:gameId/end`         | 強制終了（result = "draw" をセット）                             |
-
-<Callout title="ターン切り替えなどのタイミング" type="info">
-  - ターン更新のタイミングは、 `/games/:gameId/capture` の時。
-</Callout>
+| メソッド | パス                            | 概要                                                             |
+| -------- | ------------------------------- | ---------------------------------------------------------------- |
+| POST     | `/games`                        | 新規ゲーム作成（gameId 発行、state.json 生成）                   |
+| GET      | `/games`                        | 過去ゲーム一覧取得（gameId, startedAt, result, summary）         |
+| GET      | `/games/:gameId`                | ゲーム状態取得（state.json を返す）                              |
+| PATCH    | `/games/:gameId`                | state.json の部分更新（管理用）                                  |
+| POST     | `/games/:gameId/slide`          | ロール紙を指定長さ（mm）だけ送る（非同期。202 Accepted）         |
+| GET      | `/games/:gameId/slide/:jobId`   | ロール紙スライドジョブステータス取得                             |
+| POST     | `/games/:gameId/capture`        | Web カメラで撮影し turn-N.png を保存                             |
+| POST     | `/games/:gameId/turn/advance`   | ターンを次に進める                                               |
+| POST     | `/games/:gameId/ai/analyze`     | ユーザの画像解析 → 単語推測 → 勝敗判定                           |
+| POST     | `/games/:gameId/ai/next`        | AI で次の単語生成 → 勝敗判定                                     |
+| POST     | `/games/:gameId/ai/plot`        | AI SVG 生成 → G-code 変換 → プロッタ送信（非同期。202 Accepted） |
+| GET      | `/games/:gameId/ai/plot/:jobId` | 描画ジョブステータス取得                                         |
+| POST     | `/games/:gameId/ai/hint`        | 単語のヒント生成                                                 |
+| POST     | `/games/:gameId/end`            | 強制終了（result = "draw" をセット）                             |
 
 ---
 
@@ -122,14 +137,7 @@ title: 'REST API 仕様書'
 ```
 
 **レスポンス**
-`201 Created`
-
-```json
-{
-  "gameId": "20251007-192416",
-  "status": "created"
-}
-```
+`201 Created` ・ `state.json`
 
 **副作用**: `games/:gameId` ディレクトリと初期 `state.json` を作成。
 
@@ -155,7 +163,7 @@ title: 'REST API 仕様書'
 
 **説明**: `state.json` を返す。
 
-**レスポンス**: `200 OK`（state.json の内容）
+**レスポンス**: `200 OK` ・ `state.json`
 
 ---
 
@@ -163,19 +171,19 @@ title: 'REST API 仕様書'
 
 **説明**: 管理用の部分更新（例: `status`, `result` をセット）。
 
-**リクエスト**（例）
+**リクエスト**
 
 ```json
 { "status": "finished", "result": "user-win" }
 ```
 
-**レスポンス**: `200 OK`（更新後の state.json を返却推奨）
+**レスポンス**: `200 OK` ・ `state.json`
 
 ---
 
 ### POST /games/:gameId/slide
 
-**説明**: ロール紙を指定長さだけ送る。
+**説明**: ロール紙を指定長さだけ送る。処理は非同期。
 
 **リクエスト**
 
@@ -184,83 +192,128 @@ title: 'REST API 仕様書'
 ```
 
 **レスポンス**
-`200 OK`
+`202 Accepted`
 
 ```json
-{ "status": "ok", "length": 100 }
+{
+  "status": "accepted",
+  "jobId": "job-20251007-192416-slide-100",
+  "message": "Sliding started."
+}
 ```
 
 **注意**: ハードウェア通信エラーは `503` を返す。
 
 ---
 
-### POST /games/:gameId/capture
+### GET /games/:gameId/slide/:jobId
 
-**説明**: カメラで撮影、`turn` をインクリメントし `turn-N.png` を保存、`history` にエントリを追加。
-
-**リクエスト**
-
-```json
-{ "actor": "user" }
-```
+**説明**: スライドジョブのステータス取得
 
 **レスポンス**
-`201 Created`
 
 ```json
-{ "turn": 3, "actor": "user", "imagePath": "turn-3.png", "state": { ... } }
+{
+  "jobId": "job-20251007-192416-slide-100",
+  "status": "sliding"
+}
 ```
 
-<Callout title="stateの内容" type="info">
-  `capture` のレスポンスに含まれる "state" は、撮影後に更新された最新の
-  `state.json` の内容そのものを返します。 フロント側では `state.json`
-  の内容をコピーして保持し、UI 表示用に随時更新します。
-</Callout>
+<Callout title="statusの内容" type="info">
+  `pending` : 待ち
 
-<Callout title="注意" type="warn">
-  `capture` は撮影と `state.json` 更新を原子的に行うこと（排他制御）。
+`sliding` ロール紙スライド中
+
+`done` : 全工程が完了
+
+`error` : いずれかの工程で失敗
+
 </Callout>
 
 ---
 
-### POST /games/:gameId/analyze
+### POST /games/:gameId/capture
 
-**説明**: 最新画像を AI 解析して単語を推測、勝敗を判定し、AI の次単語を生成する（描画は別 API `plot` ）。
+**説明**: カメラで撮影し `turn-N.png` を保存、`history` の `image` を更新。
 
 **リクエスト**
 
 なし（ボディ不要）
 
 **レスポンス**
-`200 OK`
-
-```json
-{
-  "analyzedWord": "りんご",
-  "aiNextWord": "ごりら",
-  "winner": null /* "ai" | "user" | null */,
-  "state": {
-    /* updated */
-  }
-}
-```
-
-**内部の流れ**:
-
-1. 最新 `turn-N.png` を解析して `analyzedWord` を得る
-2. `analyzedWord` が `ん` で終わればユーザ敗北 → `result: "ai-win"` , `status: finished` をセット
-3. AI の次単語を生成。AI の単語が `ん` で終われば AI 敗北 → `result: "user-win"` , `status: finished` をセット
-4. AI の描画は `POST /games/`{`gameId`}/plot` で開始する（分離）
-
-<Callout title="stateの内容（再掲）" type="info">
-  `capture` のレスポンスに含まれる "state" は、撮影後に更新された最新の
-  `state.json` の内容そのものを返します。 フロント側では `state.json`
-  の内容をコピーして保持し、UI 表示用に随時更新します。
-</Callout>
+`201 Created` ・ `state.json`
 
 ---
 
-### POST /games/:gameId/plot
+### POST /games/:gameId/turn/advance
+
+**説明**: ターンを進める。
+
+**リクエスト**
+
+なし（ボディ不要）
+
+**レスポンス**
+`200 OK` ・ `state.json`
+
+**内部の流れ**:
+
+1. turn をインクリメントする。
+2. history[] に新たなエントリを追加する。（ `word`, `image` は null）
+
+   ```json
+   // 例
+
+   "history": [
+    ...,
+    {
+      "actor": "user",
+      "word": null,
+      "image": null
+    }
+   ]
+   ```
+
+---
+
+### POST /games/:gameId/ai/analyze
+
+**説明**: 最新画像を AI 解析して単語を推測、勝敗を判定する。
+
+**リクエスト**
+
+なし（ボディ不要）
+
+**レスポンス**
+`200 OK` ・ `state.json`
+
+**内部の流れ**:
+
+1. 最新 `turn-N.png` を解析して単語を解析する
+2. `analyzedWord` が `ん` で終わればユーザ敗北 → `result: "ai-win"` , `status: finished` をセット
+
+---
+
+### POST /games/:gameId/ai/next
+
+**説明**: AI で次の単語を生成し、AI が生成した単語の勝敗判定
+
+**リクエスト**
+
+なし（ボディ不要）
+
+**レスポンス**
+
+`201 Created` ・ `state.json`
+
+**内部の流れ**:
+
+1. 直前のユーザの単語を元に新単語生成
+2. 生成された単語 が `ん` で終われば AI 敗北 → `result: "user-win"` , `status: finished` をセット
+
+---
+
+### POST /games/:gameId/ai/plot
 
 **説明**: 指定単語を SVG 化 →G-code 化 → プロッタへ送信して描画を開始する。処理は非同期。
 
@@ -287,14 +340,17 @@ title: 'REST API 仕様書'
 
 ---
 
-### GET /games/:gameId/plot/:jobId
+### GET /games/:gameId/ai/plot/:jobId
 
 **説明**: 描画ジョブのステータス取得
 
 **レスポンス**
 
 ```json
-{ "jobId": "...", "status": "plotting" }
+{
+  "jobId": "job-20251007-192416-plot-1",
+  "status": "plotting"
+}
 ```
 
 <Callout title="statusの内容" type="info">
@@ -310,7 +366,7 @@ title: 'REST API 仕様書'
 
 ---
 
-### POST /games/:gameId/hint
+### POST /games/:gameId/ai/hint
 
 **説明**: 単語のヒントを生成して返す
 
@@ -335,44 +391,22 @@ title: 'REST API 仕様書'
 **リクエスト**: 省略可（任意で reason を送れる）
 
 **レスポンス**
-`200 OK`
-
-```json
-{ "gameId": "20251007-192416", "status": "finished", "result": "draw" }
-```
+`200 OK` ・ `state.json`
 
 **副作用**: 実行中ジョブがあれば停止命令を試行（可能なら hardware 側の停止を呼び出す）。
 
 ---
 
-## 5. UI とエンドポイントのマッピング
-
-- **描画完了** → `POST /games/:gameId/capture`（撮影・state 更新）
-- **解析開始** → `POST /games/:gameId/analyze` → UI は `thinking` 表示
-- **AI 描画開始** → `POST /games/:gameId/plot` → レスポンスで `jobId` を受け取り `drawing` 表示
-- **描画完了検知** → `GET /games/:gameId/plot/:jobId` をポーリングして `done` が帰ってきたら完了
-- **ヒント取得** → `POST /games/:gameId/hint`
-- **強制終了** → `POST /games/:gameId/end` → `result = "draw"`
-
----
-
-## 6. 運用上の注意点
-
-- **排他制御**: `state.json` 更新はファイルロックまたは DB トランザクションで原子性を保証する
-- **非同期処理**: 描画は `202 Accepted` を返しジョブ管理を行う（ポーリング or SSE/WebSocket）
-- **冪等性**: 重要な非冪等 API（capture/plot/slide）はフロントで二重送信を防ぐかサーバでジョブ ID 管理
-- **エラーハンドリング**: ハードウェア/AI 障害時は明確な HTTP ステータス（503 等）を返す
-- **ログ**: 各主要アクションをログに残す（gcode・grbl ログ含む）
-- **将来の認証**: 展示では不要だが、将来的に `Authorization` を追加しやすいミドルウェア設計を推奨
-
----
-
-## 7. 付録：TypeScript 型定義
+## 5. TypeScript 型定義
 
 以下は実装時に使える TypeScript の型定義です。
 
 ```typescript
 // types.ts
+
+// =================
+//       基本形
+// =================
 
 export type Actor = 'user' | 'ai';
 export type GameStatus = 'created' | 'playing' | 'finished' | 'aborted';
@@ -393,25 +427,26 @@ export interface GameState {
   history: HistoryEntry[];
 }
 
-// API: POST /games
+// =================
+//        API
+// =================
+
+// POST /games
 export interface CreateGameRequest {
   firstActor: Actor;
 }
-export interface CreateGameResponse {
-  gameId: string;
-  status: 'created';
-}
+export type CreateGameResponse = GameState;
 
-// API: GET /games (一覧の各要素)
+// GET /games (一覧の各要素)
 export interface GamesListItem {
   gameId: string;
   result: GameResult;
 }
 
-// API: GET /games/:gameId
+// GET /games/:gameId
 export type GetGameStateResponse = GameState;
 
-// API: PATCH /games/:gameId
+// PATCH /games/:gameId
 export interface PatchGameRequest {
   status?: GameStatus;
   result?: GameResult;
@@ -419,36 +454,36 @@ export interface PatchGameRequest {
 }
 export type PatchGameResponse = GameState;
 
-// API: POST /games/{gameId}/slide
+// POST /games/{gameId}/slide
 export interface SlideRequest {
   length: number; // mm
 }
 export interface SlideResponse {
-  status: 'ok' | 'error';
-  length?: number;
+  status: 'accepted' | 'error';
+  jobId?: string;
   message?: string;
 }
 
-// API: POST /games/{gameId}/capture
-export interface CaptureRequest {
-  actor: Actor;
-}
-export interface CaptureResponse {
-  turn: number;
-  actor: Actor;
-  imagePath: string;
-  state: GameState;
+// GET /games/{gameId}/slide/{jobId}
+export type SlideJobStatus = 'pending' | 'sliding' | 'done' | 'error';
+export interface SlideJobResponse {
+  jobId: string;
+  status: SlideJobStatus;
 }
 
-// API: POST /games/{gameId}/analyze
-export interface AnalyzeResponse {
-  analyzedWord: string | null;
-  aiNextWord?: string | null;
-  winner?: Actor | null;
-  state: GameState;
-}
+// POST /games/{gameId}/capture
+export type CaptureResponse = GameState;
 
-// API: POST /games/{gameId}/plot
+// POST /games/{gameId}/turn/advance
+export type AdvanceTurnResponse = GameState;
+
+// POST /games/{gameId}/ai/analyze
+export type AnalyzeResponse = GameState;
+
+// POST /games/{gameId}/ai/next
+export type NextResponse = GameState;
+
+// POST /games/{gameId}/ai/plot
 export interface PlotRequest {
   word: string;
 }
@@ -458,14 +493,14 @@ export interface PlotResponse {
   message?: string;
 }
 
-// API: GET /games/{gameId}/plot/{jobId}
+// GET /games/{gameId}/ai/plot/{jobId}
 export type PlotJobStatus = 'svg_generating' | 'plotting' | 'done' | 'error';
 export interface PlotJobResponse {
   jobId: string;
   status: PlotJobStatus;
 }
 
-// API: POST /games/{gameId}/hint
+// POST /games/{gameId}/ai/hint
 export interface HintRequest {
   word: string;
 }
@@ -473,12 +508,8 @@ export interface HintResponse {
   hint: string;
 }
 
-// API: POST /games/{gameId}/end
-export interface EndResponse {
-  gameId: string;
-  status: GameStatus; // finished
-  result: GameResult; // draw
-}
+// POST /games/{gameId}/end
+export type EndResponse = GameState;
 ```
 
 <br />
