@@ -1,3 +1,512 @@
 ---
-title: API設計
+title: "展示用 絵しりとりマシン — REST API 仕様書"
+description: "展示用の絵しりとりマシンのREST APIを整理した仕様書"
+lastUpdated: "2025-01-27"
 ---
+
+## 目次
+
+- [1. ディレクトリ構成](#1-ディレクトリ構成)
+- [2. state.json フォーマット](#2-statejson-フォーマット仕様)
+- [3. API一覧（概要）](#3-api一覧概要)
+- [4. 各APIの詳細仕様](#4-各apiの詳細仕様)
+- [5. UI とエンドポイントのマッピング](#5-ui-とエンドポイントのマッピング)
+- [6. 運用上の注意点](#6-運用上の注意点)
+- [7. 付録：TypeScript 型定義](#7-付録typescript-型定義)
+
+---
+
+## 1. ディレクトリ構成
+
+```text
+/app-root
+ ├─ games/
+ │   ├─ 20251007-1924/             # gameId = YYYYMMDD-HHMM
+ │   │   ├─ state.json
+ │   │   ├─ turn-1.png
+ │   │   ├─ turn-2.png
+ │   │   ├─ svg/
+ │   │   │  ├─ turn-2.svg
+ │   │   │  └─ turn-4.svg
+ │   │   └─ gcode/
+ │   │      ├─ turn-2.gcode
+ │   │      └─ turn-4.gcode
+ │   └─ 20251008-1030/
+ │       └─ ...
+ ├─ uploads/                       # （任意）一時保存用
+ ├─ logs/
+ └─ config/
+```
+
+* `gameId` は `YYYYMMDD-HHMM` 形式で一貫。`games/`{`gameId`}/state.json` がそのゲームの SOT（source of truth）。
+
+---
+
+## 2. state.json フォーマット
+
+### フィールド
+
+* `gameId` (string)
+* `firstActor` ("user" | "ai")
+* `turn` (integer) — 最新ターン番号
+* `status` ("created" | "playing" | "finished" | "aborted")
+* `result` ("ai-win" | "user-win" | "draw" | null)
+* `startedAt` (ISO8601 string)
+* `finishedAt` (ISO8601 string | null)
+* `history` (array of entries)
+
+  * entry:
+
+    * `turn` (integer)
+    * `actor` ("user" | "ai")
+    * `word` (string | null)
+    * `image` (string | null) — 相対パス（例: `turn-3.png`）
+    * `svg` (string | null)
+    * `gcode` (string | null)
+    * `timestamp` (ISO8601 string)
+    * `note` (string | optional)
+* `meta` (object | optional)
+
+### 例
+
+```json
+{
+  "gameId": "20251007-1924",
+  "firstActor": "user",
+  "turn": 3,
+  "status": "playing",
+  "result": "none",
+  "startedAt": "2025-10-07T19:24:00+09:00",
+  "finishedAt": null,
+  "history": [
+    {
+      "turn": 1,
+      "actor": "user",
+      "word": "りんご",
+      "image": "turn-1.png",
+      "svg": null,
+      "gcode": null,
+      "timestamp": "2025-10-07T19:24:10+09:00"
+    },
+    {
+      "turn": 2,
+      "actor": "ai",
+      "word": "ゴリラ",
+      "image": "turn-2.png",
+      "svg": "svg/turn-2.svg",
+      "gcode": "gcode/turn-2.gcode",
+      "timestamp": "2025-10-07T19:25:05+09:00"
+    },
+    {
+      "turn": 3,
+      "actor": "user",
+      "word": null,
+      "image": "turn-3.png",
+      "svg": null,
+      "gcode": null,
+      "timestamp": "2025-10-07T19:26:30+09:00"
+    }
+  ],
+  "meta": {
+    "notes": "展示用データ"
+  }
+}
+```
+
+---
+
+## 3. API一覧（概要）
+
+| メソッド | パス | 概要 |
+|---------|------|------|
+| POST | `/games` | 新規ゲーム作成（gameId発行、state.json生成） |
+| GET | `/games` | 過去ゲーム一覧取得（gameId, startedAt, result, summary） |
+| GET | `/games/`{`gameId`}` | ゲーム状態取得（state.json を返す） |
+| PATCH | `/games/`{`gameId`}` | state.json の部分更新（管理用） |
+| POST | `/games/`{`gameId`}/slide` | ロール紙を指定長さ（mm）だけ送る |
+| POST | `/games/`{`gameId`}/capture` | Webカメラで撮影し turn-N.png を保存 / state.json 更新（turn++） |
+| POST | `/games/`{`gameId`}/analyze` | 画像解析 → 単語推測 → 勝敗判定 → AI次単語生成（描画開始は別） |
+| POST | `/games/`{`gameId`}/plot` | SVG→G-code変換→プロッタ送信（非同期。202 Accepted） |
+| GET | `/games/`{`gameId`}/plot/`{`jobId`}` | 描画ジョブステータス取得（任意） |
+| POST | `/games/`{`gameId`}/hint` | 単語のヒント生成 |
+| POST | `/games/`{`gameId`}/end` | 強制終了（result = "draw" をセット） |
+| DELETE | `/games/`{`gameId`}` | （任意）ゲームデータ削除 |
+
+---
+
+## 4. 各APIの詳細仕様
+
+### POST /games
+
+**説明**: 新規ゲームを作成する。
+
+**リクエスト**
+
+```json
+{ "firstActor": "user" }
+```
+
+**レスポンス**
+`201 Created`
+
+```json
+{
+  "gameId": "20251007-1924",
+  "status": "created",
+  "startedAt": "2025-10-07T19:24:00+09:00"
+}
+```
+
+**副作用**: `games/`{`gameId`}` ディレクトリと初期 `state.json` を作成。
+
+---
+
+### GET /games
+
+**説明**: すべての `games/*/state.json` を参照して簡易一覧を返す。
+
+**レスポンス**
+`200 OK`
+
+```json
+[
+  { "gameId": "20251007-1924", "startedAt": "2025-10-07T19:24:00+09:00", "result": "none", "summary": "firstActor=user, turns=3" },
+  { "gameId": "20251006-1845", "startedAt": "2025-10-06T18:45:00+09:00", "result": "ai-win", "summary": "firstActor=ai, turns=6" }
+]
+```
+
+---
+
+### GET /games/`{`gameId`}`
+
+**説明**: `state.json` を返す。
+
+**レスポンス**: `200 OK`（state.json の内容）
+
+---
+
+### PATCH /games/`{`gameId`}`
+
+**説明**: 管理用の部分更新（例: `status`, `result`, `finishedAt` をセット）。
+
+**リクエスト**（例）
+
+```json
+{ "status": "finished", "result": "user-win", "finishedAt": "2025-10-07T19:30:00+09:00" }
+```
+
+**レスポンス**: `200 OK`（更新後の state.json を返却推奨）
+
+---
+
+### POST /games/`{`gameId`}`/slide
+
+**説明**: ロール紙を指定長さだけ送る。
+
+**リクエスト**
+
+```json
+{ "length": 100 }
+```
+
+**レスポンス**
+`200 OK`
+
+```json
+{ "status": "ok", "length": 100 }
+```
+
+**注意**: ハードウェア通信エラーは `503` を返す。
+
+---
+
+### POST /games/`{`gameId`}`/capture
+
+**説明**: カメラで撮影、`turn` をインクリメントし `turn-N.png` を保存、`history` にエントリを追加。
+
+**リクエスト**
+
+```json
+{ "actor": "user" }
+```
+
+**レスポンス**
+`201 Created`
+
+```json
+{ "turn": 3, "actor": "user", "imagePath": "turn-3.png", "state": { ... } }
+```
+
+**注意**: `capture` は撮影と `state.json` 更新を原子的に行うこと（排他制御）。
+
+---
+
+### POST /games/`{`gameId`}`/analyze
+
+**説明**: 最新画像をAI解析して単語を推測、勝敗を判定し、AIの次単語を生成する（描画は別API）。
+
+**リクエスト**
+
+```json
+{ "actor": "user" }
+```
+
+**レスポンス**
+`200 OK`
+
+```json
+{
+  "analyzedWord": "りんご",
+  "confidence": 0.82,
+  "userLost": false,
+  "aiNextWord": "ごりら",
+  "state": { /* updated */ }
+}
+```
+
+**内部の流れ**:
+
+1. 最新 `turn-N.png` を解析して `analyzedWord` を得る
+2. `analyzedWord` が `ん` で終わればユーザ敗北 → `result: "ai-win"` をセット
+3. AI の次単語を生成。AIの単語が `ん` で終われば AI敗北 → `result: "user-win"` をセット
+4. AIの描画は `POST /games/`{`gameId`}/plot` で開始する（分離）
+
+---
+
+### POST /games/`{`gameId`}`/plot
+
+**説明**: 指定単語をSVG化→G-code化→プロッタへ送信して描画を開始する。処理は非同期。
+
+**リクエスト**
+
+```json
+{ "word": "ごりら", "turn": 4 }
+```
+
+**レスポンス**
+`202 Accepted`
+
+```json
+{ "status": "accepted", "jobId": "job-20251007-1924-plot-1", "message": "Plotting started." }
+```
+
+**副作用（非同期ワーカー）**
+
+* SVG 保存 → G-code 保存 → Grblへ送信 → 描画完了後カメラ撮影 → `history` 更新 → `state.json` 更新
+
+---
+
+### GET /games/`{`gameId`}`/plot/`{`jobId`}`
+
+**説明**: 描画ジョブのステータス取得
+
+**レスポンス**
+
+```json
+{ "jobId": "...", "status": "running", "startedAt": "...", "finishedAt": null }
+```
+
+---
+
+### POST /games/`{`gameId`}`/hint
+
+**説明**: 単語のヒントを生成して返す（ヒント履歴を残したい場合は `meta` に追記しても良い）。
+
+**リクエスト**
+
+```json
+{ "word": "ぼたん" }
+```
+
+**レスポンス**
+
+```json
+{ "hint": "春に咲く花で、花弁が大きく華やかです。" }
+```
+
+---
+
+### POST /games/`{`gameId`}`/end
+
+**説明**: 強制終了（UIの「ゲーム終了」ボタン）。`result` を `"draw"` にして `status` を `"finished"` に更新する。
+
+**リクエスト**: 省略可（任意で reason を送れる）
+
+**レスポンス**
+`200 OK`
+
+```json
+{ "gameId": "20251007-1924", "status": "finished", "result": "draw", "finishedAt": "2025-10-07T19:40:10+09:00" }
+```
+
+**副作用**: 実行中ジョブがあれば停止命令を試行（可能なら hardware 側の停止を呼び出す）。
+
+---
+
+### DELETE /games/`{`gameId`}`
+
+**説明**: 管理用。ゲームデータ削除。
+
+**レスポンス**: `204 No Content`
+
+---
+
+## 5. UI とエンドポイントのマッピング
+
+* **ユーザの描画完了** → `POST /games/`{`gameId`}/capture`（撮影・state更新）
+* **解析開始** → `POST /games/`{`gameId`}/analyze` → UI は `thinking` 表示
+* **AI描画開始** → `POST /games/`{`gameId`}/plot` → レスポンスで `jobId` を受け取り `drawing` 表示
+* **描画完了検知** → `GET /games/`{`gameId`}/plot/`{`jobId`}` または `GET /games/`{`gameId`}` をポーリングして `history` に画像が追加されたら完了
+* **ヒント取得** → `POST /games/`{`gameId`}/hint`
+* **強制終了** → `POST /games/`{`gameId`}/end` → `result = "draw"`
+
+---
+
+## 6. 運用上の注意点
+
+* **排他制御**: `state.json` 更新はファイルロックまたは DB トランザクションで原子性を保証する
+* **非同期処理**: 描画は `202 Accepted` を返しジョブ管理を行う（ポーリング or SSE/WebSocket）
+* **冪等性**: 重要な非冪等 API（capture/plot/slide）はフロントで二重送信を防ぐかサーバでジョブID管理
+* **エラーハンドリング**: ハードウェア/AI障害時は明確なHTTPステータス（503等）を返す
+* **ログ**: 各主要アクションをログに残す（gcode・grblログ含む）
+* **将来の認証**: 展示では不要だが、将来的に `Authorization` を追加しやすいミドルウェア設計を推奨
+
+---
+
+## 7. 付録：TypeScript 型定義
+
+以下は実装時に使える TypeScript の型定義（`types.ts` などに保存して利用してください）。
+
+```typescript
+// types.ts
+
+export type Actor = "user" | "ai";
+export type GameStatus = "created" | "playing" | "finished" | "aborted";
+export type GameResult = "ai-win" | "user-win" | "draw" | "none";
+
+export interface HistoryEntry {
+  turn: number;
+  actor: Actor;
+  word: string | null;
+  image: string | null;    // 相対パス e.g. "turn-3.png"
+  svg?: string | null;     // 相対パス e.g. "svg/turn-4.svg"
+  gcode?: string | null;   // 相対パス e.g. "gcode/turn-4.gcode"
+  timestamp: string;       // ISO8601
+  note?: string | null;
+}
+
+export interface GameState {
+  gameId: string;          // YYYYMMDD-HHMM
+  firstActor: Actor;
+  turn: number;            // 最新ターン番号
+  status: GameStatus;
+  result: GameResult;      // "ai-win" | "user-win" | "draw" | "none"
+  startedAt: string;       // ISO8601
+  finishedAt?: string | null;
+  history: HistoryEntry[];
+  meta?: Record<string, any> | null;
+}
+
+// API: POST /games
+export interface CreateGameRequest {
+  firstActor: Actor;
+}
+export interface CreateGameResponse {
+  gameId: string;
+  status: "created";
+  startedAt: string;
+}
+
+// API: GET /games (一覧の各要素)
+export interface GamesListItem {
+  gameId: string;
+  startedAt: string;
+  result: GameResult;
+  summary?: string;
+}
+
+// API: POST /games/{gameId}/slide
+export interface SlideRequest {
+  length: number; // mm
+}
+export interface SlideResponse {
+  status: "ok" | "error";
+  length?: number;
+  message?: string;
+}
+
+// API: POST /games/{gameId}/capture
+export interface CaptureRequest {
+  actor: Actor;
+}
+export interface CaptureResponse {
+  turn: number;
+  actor: Actor;
+  imagePath: string;
+  state: GameState;
+}
+
+// API: POST /games/{gameId}/analyze
+export interface AnalyzeRequest {
+  actor: Actor; // 解析対象の actor（通常 user）
+}
+export interface AnalyzeResponse {
+  analyzedWord: string | null;
+  confidence?: number | null; // 0..1
+  userLost?: boolean;
+  aiNextWord?: string | null;
+  state: GameState;
+}
+
+// API: POST /games/{gameId}/plot
+export interface PlotRequest {
+  word: string;
+  turn?: number;
+}
+export interface PlotResponse {
+  status: "accepted" | "error";
+  jobId?: string;
+  message?: string;
+}
+
+// API: GET /games/{gameId}/plot/{jobId}
+export type PlotJobStatus = "queued" | "running" | "completed" | "failed";
+export interface PlotJobResponse {
+  jobId: string;
+  status: PlotJobStatus;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+  message?: string | null;
+}
+
+// API: POST /games/{gameId}/hint
+export interface HintRequest {
+  word?: string; // 未指定なら直前の単語候補を使う
+}
+export interface HintResponse {
+  hint: string;
+}
+
+// API: POST /games/{gameId}/end
+export interface EndResponse {
+  gameId: string;
+  status: GameStatus; // finished
+  result: GameResult; // draw
+  finishedAt: string;
+}
+```
+
+---
+
+## 変更履歴 / 備考
+
+* `state.json` の `history` に統一
+* `result` フィールドを追加して後から結果を参照しやすくした
+* `POST /games/`{`gameId`}/slide` を明確に定義し、すべて `/games/`{`gameId`}` 配下で管理
+* `capture`, `analyze`, `plot` の粒度は維持し、UI 表示（thinking → drawing）を容易に
+
+---
+
+必要であれば、この `.mdx` をファイル出力してダウンロードリンクを作成することもできます（実装環境依存）。
+
+変更点や補足があれば教えてください。
