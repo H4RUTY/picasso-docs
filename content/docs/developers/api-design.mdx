@@ -397,7 +397,204 @@ title: 'REST API 仕様書'
 
 ---
 
-## 5. TypeScript 型定義
+## 5. （⚠️ 注意） state.json 更新の分担について
+
+各 API は、 `state.json` のうちどのフィールドを更新するか明確に分担されています。
+この分担に従うことで、サーバ・フロント間で常に整合性の取れた状態を維持します。
+
+- **`turn` のインクリメント, `history[]` エントリの新規作成**:
+
+  - `/turn/advance` が行います。<br/>
+
+- **`history[]` 中の `word` の更新**:
+
+  - ユーザのターンでは `/ai/analyze` が行います。
+  - AI のターンでは `/ai/next` が行います。
+
+- **`history[]` 中の `image` の更新**:
+
+  - `/capture` が行います。
+
+---
+
+### ターン別の更新シーケンス
+
+#### ユーザのターン
+
+1. ゲーム開始  
+   `POST /games`
+
+```diff
++ {
++   "gameId": "20251007-192416",
++   "firstActor": "user",
++   "turn": 0,
++   "status": "playing",
++   "result": null,
++   "history": []
++ }
+```
+
+2. `turn++` 、新規エントリ追加  
+   `POST /turn/advance`
+
+```diff
+  {
+    "gameId": "20251007-192416",
+    "firstActor": "user",
+-   "turn": 0,
++   "turn": 1,
+    "status": "playing",
+    "result": null,
+    "history": [
++     {
++       "actor": "user",
++       "word": "null",
++       "image": "null"
++     }
+    ]
+  }
+```
+
+3. `image` 更新  
+   `POST /capture`
+
+```diff
+  {
+    "gameId": "20251007-192416",
+    "firstActor": "user",
+    "turn": 1,
+    "status": "playing",
+    "result": null,
+    "history": [
+      {
+        "actor": "user",
+        "word": null,
+-       "image": null
++       "image": "turn-1.png"
+      }
+    ]
+  }
+```
+
+4. `word` 追加  
+   `POST /ai/analyze`
+
+```diff
+  {
+    "gameId": "20251007-192416",
+    "firstActor": "user",
+    "turn": 1,
+    "status": "playing",
+    "result": null,
+    "history": [
+      {
+        "actor": "user",
+-       "word": null,
++       "word": "りんご",
+        "image": "turn-1.png"
+      }
+    ]
+  }
+```
+
+5. AI のターンへ移行
+
+<br />
+
+#### AI のターン
+
+1. ゲーム開始  
+   `POST /games`
+
+```diff
++ {
++   "gameId": "20251007-192416",
++   "firstActor": "ai",
++   "turn": 0,
++   "status": "playing",
++   "result": null,
++   "history": []
++ }
+```
+
+2. `turn++` 、新規エントリ追加  
+   `POST /turn/advance`
+
+```diff
+  {
+    "gameId": "20251007-192416",
+    "firstActor": "ai",
+-   "turn": 0,
++   "turn": 1,
+    "status": "playing",
+    "result": null,
+    "history": [
++     {
++       "actor": "ai",
++       "word": "null",
++       "image": "null"
++     }
+    ]
+  }
+```
+
+3. `word` 追加（AI が思考）  
+   `POST /ai/next`
+
+```diff
+  {
+    "gameId": "20251007-192416",
+    "firstActor": "ai",
+    "turn": 1,
+    "status": "playing",
+    "result": null,
+    "history": [
+      {
+        "actor": "ai",
+-       "word": null,
++       "word": "りんご",
+        "image": null
+      }
+    ]
+  }
+```
+
+4. `image` 更新（プロッタ描画後）  
+   `POST /capture`
+
+```diff
+  {
+    "gameId": "20251007-192416",
+    "firstActor": "ai",
+    "turn": 1,
+    "status": "playing",
+    "result": null,
+    "history": [
+      {
+        "actor": "ai",
+        "word": "りんご",
+-       "image": null
++       "image": "turn-1.png"
+      }
+    ]
+  }
+```
+
+5. ユーザ のターンへ移行
+
+---
+
+### まとめ（ターン進行の原則）
+
+| ターン     | 手順                                              | API 呼び出し順序                             | 更新対象                |
+| ---------- | ------------------------------------------------- | -------------------------------------------- | ----------------------- |
+| **ユーザ** | 1️⃣ ターンを進める → 2️⃣ 画像を取得 → 3️⃣ 単語を解析 | `/turn/advance` → `/capture` → `/ai/analyze` | `turn`, `image`, `word` |
+| **AI**     | 1️⃣ ターンを進める → 2️⃣ 単語を生成 → 3️⃣ 画像を取得 | `/turn/advance` → `/ai/next` → `/capture`    | `turn`, `word`, `image` |
+
+---
+
+## 6. TypeScript 型定義
 
 以下は実装時に使える TypeScript の型定義です。
 
