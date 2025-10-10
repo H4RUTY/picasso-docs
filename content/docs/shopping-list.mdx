@@ -7,6 +7,8 @@ import shoppingList from './shopping-list.ts';
 export const sum = shoppingList.reduce((sum, item) => sum + item.price, 0);
 export const fmt = n => n.toLocaleString('ja-JP');
 
+<br/>
+
 <table>
   <thead>
     <tr>
@@ -17,7 +19,7 @@ export const fmt = n => n.toLocaleString('ja-JP');
   </thead>
   <tbody>
     {shoppingList.map(item => (
-      <tr key={item.id}>
+      <tr key={item.name}>
         <td>{item.name}</td>
         <td>
           <a href={item.url}>
@@ -38,31 +40,4 @@ export const fmt = n => n.toLocaleString('ja-JP');
   </tbody>
 </table>
 
-<br />
-
-### 備考
-
-<Accordions type="single">
-  <Accordion title="ロッドを金属にするなら">
-    - [8mmクロームスチールロッド（35cm
-    x2）](https://www.amazon.co.jp/8X150mm-8mmリニアモーションロッド、リニアベアリング-、リニアローラーベアリング-3dプリンター部品、DIY、CNC部品-、メートル法のh8公差、高硬度、耐摩耗/dp/B08XYL4G5D/ref=sr_1_1?__mk_ja_JP=カタカナ&dib=eyJ2IjoiMSJ9.AyLuN144yseTPXi63R02r7DFpqtZtumKhy5HvOgfbbD_ttEggoY08ERy64JAI8Miwd67XxUdXl9a8_qVgcZ99IdSLmJwnzzPzQ5QVkDJ20vjcpPFsi9NbBoPd058gxM-S6lvkklsYT97mg-gQdSYgrGLLgajUpA0oH1hvug7yMWOX3OSNDC7Q9DVn0jOJfsM8jPDSV56Y4kgYx6XbpLNfW80PhM5s_uzsUn2t4Yrc542Wi30GVzS-2pQEMD8Tzm-mQHjQENNaCAWnLP3jprubZRkpoeiE2dKWaTxdnk1wQ4.onjkNM26icJfqDDneSX2iX44hC6MxVg96JWNkZcoWsA&dib_tag=se&keywords=chrome%2B8mm%2Brod&qid=1759475996&s=industrial&sr=1-1&th=1)
-    : 883円
-    <Callout title="But" type="warn">
-      55mmの金属製ロッドがなかなか見つからない + 金属だと高いので、木製がベター
-    </Callout>
-  </Accordion>
-</Accordions>
-
-<Accordions type="single">
-  <Accordion title="既存のステッピングモータが使えるなら">
-    - [CNCシールド + DRV8825
-    ステッピングモータドライバ](https://www.amazon.co.jp/Youmile-DR-YM-341-CNC%E3%82%B7%E3%83%BC%E3%83%AB%E3%83%89V3-0%E6%8B%A1%E5%BC%B5%E3%83%9C%E3%83%BC%E3%83%89%E3%82%AD%E3%83%83%E3%83%88%EF%BC%88Arduino%E7%94%A8%E3%83%9C%E3%83%BC%E3%83%89%E4%BB%98%E3%81%8D%EF%BC%89%E3%80%814%E5%80%8B-DRV8255%E3%82%B9%E3%83%86%E3%83%83%E3%83%94%E3%83%B3%E3%82%B0%E3%83%A2%E3%83%BC%E3%82%BF%E3%83%BC%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC%E3%81%A8%E3%83%92%E3%83%BC%E3%83%88%E3%82%B7%E3%83%B3%E3%82%AF%E3%80%8110%E5%80%8B%E3%82%B8%E3%83%A3%E3%83%B3%E3%83%91%E3%83%BC%E3%82%AD%E3%83%A3%E3%83%83%E3%83%97%E3%80%81%E5%BD%AB%E5%88%BB%E6%A9%9F%E7%94%A8USB%E3%82%B1%E3%83%BC%E3%83%96%E3%83%AB/dp/B08KXNQVQP/ref=sr_1_3?dib=eyJ2IjoiMSJ9.x1hYN4Tpksczl-dkU1C1AIGr42LaGiCxO__u-xhUgVyB0GH9fFGmKC9Nx82jX0Fx8bDvubDZMSp-sQSKpcmoKa-OE2-vM52JYPdcKfyJII1WwCyAiIZI6ihooKMhuL41FJlsQkjRh4trVkr5QrCj7bCn9zUk9EJ6GFhVJ9s-fbhu0i6hbRqTFkx3dhlP8ojWcL7QS8iH4xeOBC-EP-tpZ0caOsgDvf6QndcDc6dEItphKkwLT_2nJJIEd8Opq8p8gs0lbF77_b07ryGoT7ScIuH9Z_BmFBKZ6HMyRLknvVI.Zzn6zNbuSuPnEjMAnmpeq2GnOOefXsipoLyVU_n2rhI&dib_tag=se&keywords=Arduino%2BCNC%E3%82%B7%E3%83%BC%E3%83%AB%E3%83%89&qid=1759474293&sr=8-3&th=1):
-    2,169円
-    <Callout title={`合計は ${fmt(sum - 3029)}円に`} type="info">
-      5,198円(ステッピングモータ付き) - 2,169円 = 3,029円浮く
-    </Callout>
-  </Accordion>
-</Accordions>
-
-<br />
 <br />
