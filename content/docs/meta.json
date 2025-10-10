@@ -1,10 +1,9 @@
 {
   "pages": [
     "concept",
-    "flow",
     "specification",
     "shopping-list",
+    "references",
     "developers"
   ]
 }
-

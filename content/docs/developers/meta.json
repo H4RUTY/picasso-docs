@@ -1,3 +1,6 @@
 {
-  "title": "Developerz"
+  "pages": [
+    "activity",
+    "api-design"
+  ]
 }

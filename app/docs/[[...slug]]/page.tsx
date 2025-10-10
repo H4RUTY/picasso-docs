@@ -22,7 +22,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
-      {page.slugs.join('/') === 'developers/api-design' ? (
+      {page.slugs.join('/') === 'developers/api-design' || page.slugs.join('/') === 'specification' ? (
         <InlineTOC items={page.data.toc} />
       ) : null}
       <DocsBody>
