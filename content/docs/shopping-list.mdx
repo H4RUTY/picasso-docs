@@ -3,41 +3,6 @@ title: 買い物リスト
 ---
 
 import shoppingList from './shopping-list.ts';
+import { ShoppingTable } from '@/components/mdx/ShoppingTable';
 
-export const sum = shoppingList.reduce((sum, item) => sum + item.price, 0);
-export const fmt = n => n.toLocaleString('ja-JP');
-
-<br/>
-
-<table>
-  <thead>
-    <tr>
-      <th>部品</th>
-      <th className="w-[20%]">リンク</th>
-      <th>金額（円）</th>
-    </tr>
-  </thead>
-  <tbody>
-    {shoppingList.map(item => (
-      <tr key={item.name}>
-        <td>{item.name}</td>
-        <td>
-          <a href={item.url}>
-            {item.shop} ↗️
-          </a>
-        </td>
-        <td>{fmt(item.price)}</td>
-      </tr>
-    ))}
-
-    <tr>
-      <td colSpan={2}>合計金額</td>
-      <td className="font-bold">
-        {fmt(sum)}
-      </td>
-    </tr>
-
-  </tbody>
-</table>
-
-<br />
+<ShoppingTable items={shoppingList} />
