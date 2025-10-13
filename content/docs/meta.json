@@ -1,9 +1,10 @@
 {
   "pages": [
+    "index",
     "concept",
     "specification",
+    "schedule",
     "shopping-list",
-    "references",
     "developers"
   ]
 }
