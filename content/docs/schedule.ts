@@ -3,7 +3,7 @@ export type ScheduleItem = {
   day: 'fri' | 'wed';
   content: string;
   todos: string;
-  tags?: string[]; // 新規追加
+  tags?: string[];
 };
 
 export const scheduleList: ScheduleItem[] = [
@@ -11,42 +11,42 @@ export const scheduleList: ScheduleItem[] = [
     date: 20250926,
     day: 'fri',
     content: 'ガイダンス・PBL1週目',
-    todos: 'オリエンテーション・チーム分け・テーマ確認',
+    todos: 'オリエンテーション',
     tags: ['#task'],
   },
   {
     date: 20251003,
     day: 'fri',
     content: 'PBL2週目',
-    todos: '仕様書案作成・技術調査',
+    todos: '役割分担・調査',
     tags: ['#task'],
   },
   {
     date: 20251010,
     day: 'fri',
     content: 'PBL3週目',
-    todos: 'ハード設計・UIモック作成',
+    todos: 'API設計完了・ペンプロッタ設計完了',
     tags: ['#task'],
   },
   {
     date: 20251017,
     day: 'fri',
     content: '中間報告会1',
-    todos: 'スライド発表・3Dプリント開始',
+    todos: 'プレゼン・3Dプリント準備・紙送り方式検討',
     tags: ['#milestone', '#task'],
   },
   {
     date: 20251024,
     day: 'fri',
     content: 'PBL4週目',
-    todos: 'パーツ発注・3Dプリント・フロントUI実装開始',
+    todos: 'パーツ発注・3Dプリント・紙送り設計',
     tags: ['#task'],
   },
   {
     date: 20251031,
     day: 'fri',
     content: 'PBL5週目',
-    todos: 'バックエンドAPI実装開始・ハード接続確認',
+    todos: '3Dプリント・バックエンドAPI試運転・画像キャプチャテスト・UIモック',
     tags: ['#task'],
   },
   {
@@ -60,22 +60,22 @@ export const scheduleList: ScheduleItem[] = [
     date: 20251114,
     day: 'fri',
     content: 'PBL6週目',
-    todos: 'フロントとバックエンド統合・画像キャプチャテスト',
+    todos: 'ペンプロッタ組み立て・Arduino/GRBLファーム書き込み・動作確認',
     tags: ['#task'],
   },
   {
     date: 20251121,
     day: 'fri',
     content: 'PBL7週目',
-    todos: 'AI解析・ターン進行処理実装',
+    todos: 'ペンプロッタ動作確認の続き・フロント/バックエンド統合',
     tags: ['#task'],
   },
   {
     date: 20251128,
     day: 'fri',
-    content: '月曜授業',
-    todos: '授業対応・進捗確認',
-    tags: ['#task'],
+    content: '月曜授業（PBL休講）',
+    todos: 'なし',
+    tags: ['#holiday'],
   },
   {
     date: 20251205,
@@ -87,22 +87,22 @@ export const scheduleList: ScheduleItem[] = [
   {
     date: 20251212,
     day: 'fri',
-    content: '中間報告会2, PBL8週目',
-    todos: '中間報告会スライド作成・ハード最終調整',
+    content: '中間報告会2・PBL8週目',
+    todos: 'スライド発表・紙送り製作',
     tags: ['#milestone', '#task'],
   },
   {
     date: 20251219,
     day: 'fri',
     content: 'PBL9週目',
-    todos: 'UI最終調整・描画機能テスト',
+    todos: '紙送り製作・シリアル通信',
     tags: ['#task'],
   },
   {
     date: 20251226,
     day: 'fri',
     content: 'PBL10週目',
-    todos: '総合テスト・バグ修正',
+    todos: '統合テスト（UI→G-code→GRBL→動作）・デバッグ',
     tags: ['#task'],
   },
   {
@@ -115,8 +115,8 @@ export const scheduleList: ScheduleItem[] = [
   {
     date: 20260107,
     day: 'wed',
-    content: 'PBL11週目',
-    todos: '展示準備・デモ動作確認',
+    content: 'PBL11週目（特別日程）',
+    todos: 'デバッグ',
     tags: ['#task'],
   },
   {
@@ -130,7 +130,7 @@ export const scheduleList: ScheduleItem[] = [
     date: 20260116,
     day: 'fri',
     content: 'PBL12週目',
-    todos: '最終調整・発表練習',
+    todos: '最終調整',
     tags: ['#task'],
   },
   {
@@ -150,9 +150,9 @@ export const scheduleList: ScheduleItem[] = [
   {
     date: 20260206,
     day: 'fri',
-    content: '発表',
-    todos: '成果発表・最終レポート提出',
-    tags: ['#milestone', '#task'],
+    content: '最終発表会',
+    todos: '発表',
+    tags: ['#milestone'],
   },
 ];
 
