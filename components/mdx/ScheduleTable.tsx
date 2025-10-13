@@ -30,27 +30,27 @@ export function ScheduleTable({ items }: ScheduleTableProps) {
   const renderTag = (tag: string) => {
     if (tag === '#milestone') {
       return (
-        <span className="inline-flex items-center rounded-full px-1 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+        <span className="inline-flex items-center mr-1 rounded-full px-1 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
           <Flag size={14} />
         </span>
       );
     }
     if (tag === '#task') {
       return (
-        <span className="inline-flex items-center rounded-full px-1 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
+        <span className="inline-flex items-center mr-1 rounded-full px-1 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
           <Wrench size={14} />
         </span>
       );
     }
     if (tag === '#holiday') {
       return (
-        <span className="inline-flex items-center rounded-full px-1 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+        <span className="inline-flex items-center mr-1 rounded-full px-1 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
           <TreePalm size={14} />
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center rounded-full px-1 py-1 bg-neutral-100 text-neutral-800 dark:bg-neutral-900/40 dark:text-neutral-200">
+      <span className="inline-flex items-center mr-1 rounded-full px-1 py-1 bg-neutral-100 text-neutral-800 dark:bg-neutral-900/40 dark:text-neutral-200">
         <TagIcon size={14} /> {tag}
       </span>
     );
