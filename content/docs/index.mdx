@@ -3,15 +3,16 @@ title: 'HOME'
 description: 絵しりとりフレンド ピカソ
 ---
 
-import { Bot, Youtube, Github } from 'lucide-react';
+import { 
+  Bot, Youtube, Github, Brain, FileCheck2, CalendarCheck2, ShoppingCart, ArrowDownUp, Wrench
+} from 'lucide-react';
 
 <Callout title="To-Do List" type="info">
-  - 完成までのロードマップ作り
   - 買い物リストのリファクタリング
   - シーケンス図の作成
 </Callout>
 
-## References
+## Links
 
 <Cards>
   <Card 
@@ -40,18 +41,20 @@ import { Bot, Youtube, Github } from 'lucide-react';
 </Cards>
 
 
-## For Everybody
+## Documents
 
 <Cards>
-  <Card title="コンセプト" href="/docs/concept" />
-  <Card title="仕様書" href="/docs/specification" />
-  <Card title="スケジュール" href="/docs/schedule" />
-  <Card title="買い物リスト" href="/docs/shopping-list" />
+  <Card icon={<Brain />} title="コンセプト" href="/docs/concept" />
+  <Card icon={<FileCheck2 />} title="仕様書" href="/docs/specification" />
+  <Card icon={<CalendarCheck2 />} title="スケジュール" href="/docs/schedule" />
+  <Card icon={<ShoppingCart />} title="買い物リスト" href="/docs/shopping-list" />
 </Cards>
 
 ## For Developerz
 
 <Cards>
-  <Card title="アクティビティ図" href="/docs/developers/activity" />
-  <Card title="API設計" href="/docs/developers/api-design" />
+  <Card icon={<ArrowDownUp />} title="アクティビティ図" href="/docs/developers/activity" />
+  <Card icon={<Wrench />} title="API設計" href="/docs/developers/api-design" />
 </Cards>
+
+<br />
