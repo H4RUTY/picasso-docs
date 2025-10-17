@@ -38,7 +38,7 @@ export const scheduleList: ScheduleItem[] = [
   {
     date: 20251024,
     day: 'fri',
-    content: 'PBL4週目',
+    content: 'PBL4週目(パーツ発注)',
     todos: 'パーツ発注・3Dプリント・紙送り設計',
     tags: ['#task'],
   },
@@ -66,7 +66,7 @@ export const scheduleList: ScheduleItem[] = [
   {
     date: 20251121,
     day: 'fri',
-    content: 'PBL7週目',
+    content: 'PBL7週目(パーツ発注2)',
     todos: 'ペンプロッタ動作確認の続き・フロント/バックエンド統合',
     tags: ['#task'],
   },
