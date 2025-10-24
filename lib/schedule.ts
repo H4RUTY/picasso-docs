@@ -46,7 +46,7 @@ export const scheduleList: ScheduleItem[] = [
     date: 20251031,
     day: 'fri',
     content: 'PBL5週目',
-    todos: '3Dプリント・ソフトウェア開発開始',
+    todos: 'ボルト確認・3Dプリント・ソフトウェア開発開始',
     tags: ['#task'],
   },
   {
