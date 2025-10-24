@@ -16,7 +16,7 @@ export const shoppingList: ShoppingItem[] = [
     shop: "モノタロウ",
     name: "8x15x25mm リニアベアリング (x1)",
     url: "https://www.monotaro.com/p/0360/7923/?t.q=%E3%83%AA%E3%83%8B%E3%82%A2%E3%83%99%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0",
-    price: 289,
+    price: 318,
   },
   {
     shop: "Amazon",
@@ -29,7 +29,7 @@ export const shoppingList: ShoppingItem[] = [
     shop: "Amazon",
     name: "コンタクトスイッチ",
     url: "https://www.amazon.co.jp/Youmile-20%E5%80%8B%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC%E3%83%AC%E3%83%90%E3%83%BC%E3%82%A2%E3%83%BC%E3%83%A03%E3%83%94%E3%83%B3AC-125250V-SPDT-1NC%E3%83%A2%E3%83%BC%E3%83%A1%E3%83%B3%E3%82%BF%E3%83%BCPCB%E7%AB%AF%E5%AD%90%E9%96%8B%E9%96%89%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81/dp/B084VNY6PK/ref=sr_1_1?dib=eyJ2IjoiMSJ9.t1m5I5mOsh71IJKrZihDGpFCXeheOAcvN3BHe55buvF0auv1DBfkut06FKL6ra5RqHW4Z_FwxPBe_A9gp1J5qMnra0rRzAzMJ38VE6UF8uEavHXe4nLM0NgyAqP5Kw8erL9mwKtxz_JrNXTRRphHTHpDZ1LJxk4yBuA2iZ0Q8Z3IlYcZC88lX5vFR29VsmXz_xTzr46T8O2YyoMnmIob2mPh3BE5lx2wMWqa28nxoDgeLyJG_F81g4W3olvYxY2MLBkIwughKRcXxLxtvSgsEi1Sg6-YqAmR061isZQAfmM.2G0SFo3yJ9ETsqTbSOjVld1VUgT4XbPUdOZ7I5BTbHY&dib_tag=se&geniuslink=true&keywords=indusky%2B10pcs%2Bmicro%2Blimit%2Bswitch%2Bwith%2Bmomentary%2Broller%2Blever%2Barm%2Bac%2B250v%2B5a%2Bspdt%2B1no%2B1nc%2Bsnap%2Baction%2Bmicro%2Bswitches&qid=1759475525&sr=8-1&th=1",
-    price: 679,
+    price: 689,
   },
   {
 
@@ -48,7 +48,7 @@ export const shoppingList: ShoppingItem[] = [
     shop: "Amazon",
     name: "ブロック付き30cm長リニアレール MGN12H",
     url: "https://www.amazon.co.jp/Akozon-%E3%83%AA%E3%83%8B%E3%82%A2%E3%82%AC%E3%82%A4%E3%83%89%E3%83%AC%E3%83%BC%E3%83%AB%E3%83%9F%E3%83%8B%E3%83%81%E3%83%A5%E3%82%A2%E3%83%AA%E3%83%8B%E3%82%A2%E3%82%B9%E3%83%A9%E3%82%A4%E3%83%89%E3%83%AC%E3%83%BC%E3%83%AB%E3%82%AC%E3%82%A4%E3%83%89%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF250mm-300mm-400mm-500mm/dp/B07Y4NWB45/ref=sr_1_5?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&crid=R7I7Z8JD5ER3&dib=eyJ2IjoiMSJ9.V2OdZ6jQk0YSq4UbbtIWuL1SlyTyXV1XmZ2W_-vMyQr-c1iwxnLeukinKUG8elchF5W_XN3KRtdJ_g9MdWsX4BBJGfZX9gdnD28dmtmHl2189xjbf2TZa6qwi7zmo9WQNqNOeTabDRfTeC_IYUJw8ymHeso9ohzcOwN3W266PCcFnajY3WDZhlcazDSCPbZtiF5tbCmKMnsEeGD_YFfmk28_HB1B8-dQGpN1kUhr-YbMaEdFjgfn-D2Z3eaqi3NJnZEkr5yG_OlZtaqxz3wteX6cCSSI3bixAMkv1tuApuY.0ZkwR7UbRYsavpRleWw1frI9ykIrFfbpHy3Nry0rME0&dib_tag=se&keywords=%E3%83%AA%E3%83%8B%E3%82%A2%E3%83%AC%E3%83%BC%E3%83%AB%2B300&qid=1759482924&s=industrial&sprefix=%E3%83%AA%E3%83%8B%E3%82%A2%E3%83%AC%E3%83%BC%E3%83%AB%2B300%2Cindustrial%2C308&sr=1-5&th=1",
-    price: 1882,
+    price: 1789,
   },
   {
     shop: "Amazon",
@@ -70,9 +70,9 @@ export const shoppingList: ShoppingItem[] = [
   },
   {
     shop: "モノタロウ",
-    name: "80mm ロールペーパー",
+    name: "幅80mm ロールペーパー",
     url: "https://www.monotaro.com/p/3136/2809/?t.q=%E3%83%AD%E3%83%BC%E3%83%AB%E3%83%9A%E3%83%BC%E3%83%91%E3%83%BC%E3%80%8080mm",
-    price: 209,
+    price: 230,
   },
   {
     shop: "モノタロウ",
@@ -83,5 +83,3 @@ export const shoppingList: ShoppingItem[] = [
 ];
 
 export default shoppingList;
-
-
