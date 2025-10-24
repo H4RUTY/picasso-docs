@@ -14,10 +14,10 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       <body className="flex flex-col min-h-screen">
         <RootProvider>
           <Banner 
-            id="banner"
+            id="schedule"
             variant='rainbow'
           >
-            スケジュールページを作成しました！みてね👌
+            買い物リストを更新しました
           </Banner>
           {children}
         </RootProvider>
