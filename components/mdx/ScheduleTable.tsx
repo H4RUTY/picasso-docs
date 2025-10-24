@@ -1,12 +1,5 @@
 import { Flag, Tag as TagIcon, Wrench, TreePalm } from 'lucide-react';
-
-type ScheduleItem = {
-  date: number;
-  day: string;
-  content: string;
-  todos: string;
-  tags?: string[];
-};
+import type { ScheduleItem } from '@/lib/schedule';
 
 type ScheduleTableProps = {
   items: ScheduleItem[];
