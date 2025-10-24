@@ -74,12 +74,6 @@ export const shoppingList: ShoppingItem[] = [
     url: "https://www.monotaro.com/p/3136/2809/?t.q=%E3%83%AD%E3%83%BC%E3%83%AB%E3%83%9A%E3%83%BC%E3%83%91%E3%83%BC%E3%80%8080mm",
     price: 230,
   },
-  {
-    shop: "モノタロウ",
-    name: "モノタロウ送料",
-    url: "https://help.monotaro.com/app/answers/detail/a_id/19/~/%E9%85%8D%E9%80%81%E6%96%99%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6",
-    price: 500,
-  },
 ];
 
 export default shoppingList;
