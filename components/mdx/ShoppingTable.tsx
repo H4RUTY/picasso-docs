@@ -1,23 +1,23 @@
 import React from 'react';
-
-type ShoppingItem = {
-  name: string;
-  url: string;
-  shop: string;
-  price: number;
-};
+import type { ShoppingItem } from '@/lib/shopping-list';
 
 type ShoppingTableProps = {
   items: ShoppingItem[];
 };
 
-export function ShoppingTable({ items }: ShoppingTableProps) {
+function ItemsTable({
+  title,
+  items,
+}: {
+  title: string;
+  items: ShoppingItem[];
+}) {
   const sum = items.reduce((sum, item) => sum + item.price, 0);
   const fmt = (n: number) => n.toLocaleString('ja-JP');
 
   return (
     <>
-      <br />
+      <h3>{title}</h3>
       <table>
         <thead>
           <tr>
@@ -27,25 +27,39 @@ export function ShoppingTable({ items }: ShoppingTableProps) {
           </tr>
         </thead>
         <tbody>
-          {items.map(item => (
+          {items.map((item) => (
             <tr key={item.name}>
               <td>{item.name}</td>
               <td>
-                <a href={item.url}>
-                  {item.shop} ↗️
-                </a>
+                <a href={item.url}>{item.shop} ↗️</a>
               </td>
               <td>{fmt(item.price)}</td>
             </tr>
           ))}
           <tr>
             <td colSpan={2}>合計金額</td>
-            <td className="font-bold">
-              {fmt(sum)}
-            </td>
+            <td className="font-bold">{fmt(sum)}</td>
           </tr>
         </tbody>
       </table>
+      <br />
+    </>
+  );
+}
+
+export function ShoppingTable({ items }: ShoppingTableProps) {
+  const studentItems = items.filter((item) => item.buyer === 'student');
+  const teacherItems = items.filter((item) => item.buyer === 'teacher');
+  const grandTotal = items.reduce((sum, item) => sum + item.price, 0);
+  const fmt = (n: number) => n.toLocaleString('ja-JP');
+
+  return (
+    <>
+      <br />
+      <ItemsTable title="自腹" items={studentItems} />
+      <ItemsTable title="予算内" items={teacherItems} />
+      <h3>合計金額</h3>
+      <p className="font-bold text-lg">{fmt(grandTotal)}円</p>
       <br />
     </>
   );
