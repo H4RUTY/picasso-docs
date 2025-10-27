@@ -1,3 +1,5 @@
+'use client';
+
 import { Flag, Tag as TagIcon, Wrench, TreePalm } from 'lucide-react';
 import type { ScheduleItem } from '@/lib/schedule';
 
