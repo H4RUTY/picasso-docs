@@ -78,7 +78,7 @@ export function baseOptions(): BaseLayoutProps {
         </>
       ),
     },
-    githubUrl: 'https://github.com/H4RUTY/picasso-docs',
+    githubUrl: 'https://github.com/picasso-studio/docs',
     links: [],
   };
 }
