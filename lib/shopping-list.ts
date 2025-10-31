@@ -33,8 +33,8 @@ export const shoppingList: ShoppingItem[] = [
     shop: "Amazon",
     name: "コンタクトスイッチ",
     buyer: "student",
-    url: "https://www.amazon.co.jp/Youmile-20%E5%80%8B%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC%E3%83%AC%E3%83%90%E3%83%BC%E3%82%A2%E3%83%BC%E3%83%A03%E3%83%94%E3%83%B3AC-125250V-SPDT-1NC%E3%83%A2%E3%83%BC%E3%83%A1%E3%83%B3%E3%82%BF%E3%83%BCPCB%E7%AB%AF%E5%AD%90%E9%96%8B%E9%96%89%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81/dp/B084VNY6PK/ref=sr_1_1?dib=eyJ2IjoiMSJ9.t1m5I5mOsh71IJKrZihDGpFCXeheOAcvN3BHe55buvF0auv1DBfkut06FKL6ra5RqHW4Z_FwxPBe_A9gp1J5qMnra0rRzAzMJ38VE6UF8uEavHXe4nLM0NgyAqP5Kw8erL9mwKtxz_JrNXTRRphHTHpDZ1LJxk4yBuA2iZ0Q8Z3IlYcZC88lX5vFR29VsmXz_xTzr46T8O2YyoMnmIob2mPh3BE5lx2wMWqa28nxoDgeLyJG_F81g4W3olvYxY2MLBkIwughKRcXxLxtvSgsEi1Sg6-YqAmR061isZQAfmM.2G0SFo3yJ9ETsqTbSOjVld1VUgT4XbPUdOZ7I5BTbHY&dib_tag=se&geniuslink=true&keywords=indusky%2B10pcs%2Bmicro%2Blimit%2Bswitch%2Bwith%2Bmomentary%2Broller%2Blever%2Barm%2Bac%2B250v%2B5a%2Bspdt%2B1no%2B1nc%2Bsnap%2Baction%2Bmicro%2Bswitches&qid=1759475525&sr=8-1&th=1",
-    price: 689,
+    url: "https://www.amazon.co.jp/%E3%83%AA%E3%83%9F%E3%83%83%E3%83%88%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81-%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81-20%E5%80%8B%E3%83%9F%E3%83%8B%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%83%AA%E3%83%9F%E3%83%83%E3%83%88%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81-125-250V-3D%E3%83%97%E3%83%AA%E3%83%B3%E3%82%BF/dp/B0DHRKVJWQ/ref=pd_sbs_d_sccl_2_2/358-2617570-1874633?pd_rd_w=bod7d&content-id=amzn1.sym.c0889d40-54df-4be4-b1c5-43522a3d0a92&pf_rd_p=c0889d40-54df-4be4-b1c5-43522a3d0a92&pf_rd_r=1EGFDTSAS3E3Q6PRSK3P&pd_rd_wg=3xKwN&pd_rd_r=97553dfd-1652-4441-a7b3-d41ae17ced5d&pd_rd_i=B0DHRKVJWQ&psc=1",
+    price: 688,
   },
   {
 
