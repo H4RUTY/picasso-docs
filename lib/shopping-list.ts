@@ -74,8 +74,8 @@ export const shoppingList: ShoppingItem[] = [
     shop: 'Amazon',
     name: 'DC電源ジャックソケット メスコネクタ',
     buyer: 'student',
-    url: 'https://www.amazon.co.jp/Hundnsney-036919-R-5%E5%80%8B5-5mmx2-1mm-DC%E9%9B%BB%E6%BA%90%E3%82%B8%E3%83%A3%E3%83%83%E3%82%AF%E3%82%BD%E3%82%B1%E3%83%83%E3%83%88%E3%83%A1%E3%82%B9%E3%83%91%E3%83%8D%E3%83%AB%E3%83%9E%E3%82%A6%E3%83%B3%E3%83%88%E3%82%B3%E3%83%8D%E3%82%AF%E3%82%BF/dp/B0BFDW5B7S/ref=asc_df_B0BFDW5B7S?tag=jpgo-22&hvadid=707479224448&hvpos=&hvnetw=g&hvrand=7250379818811546117&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=1009163&hvtargid=pla-2297249038972&psc=1&hvocijid=7250379818811546117-B0BFDW5B7S-&hvexpln=0',
-    price: 330,
+    url: 'https://www.amazon.co.jp/Jdeijfev-R-5%E5%80%8B5-5mmx2-1mm-%E9%9B%BB%E6%BA%90%E3%82%B8%E3%83%A3%E3%83%83%E3%82%AF%E3%82%BD%E3%82%B1%E3%83%83%E3%83%88%E3%83%A1%E3%82%B9%E3%83%91%E3%83%8D%E3%83%AB%E3%83%9E%E3%82%A6%E3%83%B3%E3%83%88%E3%82%B3%E3%83%8D%E3%82%AF%E3%82%BF/dp/B09X4YTPNK/ref=sr_1_22?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&crid=384FTV3JSQ2LQ&dib=eyJ2IjoiMSJ9.dpk-qNblrJPlXLHN435KNPOnZrSrAep0MA2nYTME2ucVWp2AsI0tadaTp7HYjB7rIKMjXYAsfzjjbT54h2NlUh1EOEELyqcFkyBqcFI6mmWzef74rt2-A-5afY42HySRUIA8Yb0qqIsOdQ0KkcjnOwj1dvI_hC6u8EaGuYeg25cOfN0A2eygZnGkbDYEtqzRzcSUyE8Dlq9wufzQCKZWmVcgRRCarA7FmB7yCniL6mEZWe5gJSjCBpohUIw70LVUeyJcVqJC7VboFDBheVIkQ1R9ySpiDwoT27zjHNWaXNc.EcAXWXifrUZcTm1eWMaMvXfWBY307rHvIduxxbTTJ64&dib_tag=se&keywords=5.5mmx2.1mm+%E3%82%BD%E3%82%B1%E3%83%83%E3%83%88+%E3%83%A1%E3%82%B9&qid=1763020490&s=electronics&sprefix=5.5mmx2.1mm+%E3%82%BD%E3%82%B1%E3%83%83%E3%83%88+%E3%83%A1%E3%82%B9,electronics,195&sr=1-22',
+    price: 366,
   },
   {
     shop: 'モノタロウ',
