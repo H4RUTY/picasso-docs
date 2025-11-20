@@ -4,8 +4,17 @@ title: 'REST API 仕様書'
 
 <br />
 
-<Callout title="当仕様書のファイル（AI に投げる用）" type="success">
-  以下をコピペすれば、API 設計を AI に投げる際に便利です。 <br />
+<Callout title="変更事項1" type="warn">
+  1のディレクトリ構成ですが、games/index.jsonを設けました。
+  このindex.jsonには、今までのゲームIDを格納します。 これにより、GET
+  /games（過去ゲーム一覧取得）が不要になりました。
+</Callout>
+
+<Callout title="変更事項2" type="warn">
+  PATCH /games/:gameId を削除しました。
+</Callout>
+
+<Callout title="当仕様書のファイル" type="success">
   [この仕様書のファイル](https://github.com/H4RUTY/picasso-docs/blob/main/content/docs/developers/api-design.mdx?plain=1)
   👈 Click This!!
 </Callout>
@@ -16,7 +25,7 @@ title: 'REST API 仕様書'
 
 本 API は「**state.json を唯一の真実（Single Source of Truth）とする**」ことを基本方針とします。
 すべての状態はこのファイルを通じて管理・共有され、サーバ・クライアント間で一貫して扱われます。
-なお、展示環境向けのローカル操作のため、API認証は不要です。
+なお、展示環境向けのローカル操作のため、API 認証は不要です。
 
 - **状態の一元管理**
 
@@ -36,13 +45,14 @@ title: 'REST API 仕様書'
   ├─ backend/
   │   ├─ src/
   │   └─ games/
+  │       ├─ index.json
   │       ├─ 20251007-192416/ # gameId = YYYYMMDD-HHMMSS
   │       │   ├─ state.json
   │       │   ├─ turn-1.png
   │       │   ├─ turn-2.png
   │       │   ├─ svg/
   │       │   │  ├─ turn-2.svg
-  │       │   │  └─ turn-4.svg 
+  │       │   │  └─ turn-4.svg
   │       │   └─ gcode/
   │       │      ├─ turn-2.svg
   │       │      └─ turn-4.svg
@@ -59,7 +69,21 @@ title: 'REST API 仕様書'
 
 ---
 
-## 2. state.json フォーマット
+## 2. index.json フィールド
+
+ゲーム ID 一覧を格納します。
+
+### 例
+
+```
+[
+  "20251007-192416",
+  "20251008-103029",
+  "20251120-213030"
+]
+```
+
+## 3. state.json フォーマット
 
 ### フィールド
 
@@ -107,14 +131,12 @@ title: 'REST API 仕様書'
 
 ---
 
-## 3. API 一覧（概要）
+## 4. API 一覧（概要）
 
 | メソッド | パス                            | 概要                                                             |
 | -------- | ------------------------------- | ---------------------------------------------------------------- |
 | POST     | `/games`                        | 新規ゲーム作成（gameId 発行、state.json 生成）                   |
-| GET      | `/games`                        | 過去ゲーム一覧取得（gameId, startedAt, result, summary）         |
 | GET      | `/games/:gameId`                | ゲーム状態取得（state.json を返す）                              |
-| PATCH    | `/games/:gameId`                | state.json の部分更新（管理用）                                  |
 | POST     | `/games/:gameId/slide`          | ロール紙を指定長さ（mm）だけ送る（非同期。202 Accepted）         |
 | GET      | `/games/:gameId/slide/:jobId`   | ロール紙スライドジョブステータス取得                             |
 | POST     | `/games/:gameId/capture`        | Web カメラで撮影し turn-N.png を保存                             |
@@ -128,7 +150,7 @@ title: 'REST API 仕様書'
 
 ---
 
-## 4. 各 API の詳細仕様
+## 5. 各 API の詳細仕様
 
 ### POST /games
 
@@ -147,39 +169,9 @@ title: 'REST API 仕様書'
 
 ---
 
-### GET /games
-
-**説明**: すべての `games/*/state.json` を参照して簡易一覧を返す。
-
-**レスポンス**
-`200 OK`
-
-```json
-[
-  { "gameId": "20251007-192416", "result": "draw" },
-  { "gameId": "20251008-103029", "result": "ai-win" }
-]
-```
-
----
-
 ### GET /games/:gameId
 
 **説明**: `state.json` を返す。
-
-**レスポンス**: `200 OK` ・ `state.json`
-
----
-
-### PATCH /games/:gameId
-
-**説明**: 管理用の部分更新（例: `status`, `result` をセット）。
-
-**リクエスト**
-
-```json
-{ "status": "finished", "result": "user-win" }
-```
 
 **レスポンス**: `200 OK` ・ `state.json`
 
@@ -401,7 +393,7 @@ title: 'REST API 仕様書'
 
 ---
 
-## 5. （⚠️ 注意） state.json 更新の分担について
+## 6. （⚠️ 注意） state.json 更新の分担について
 
 各 API は、 `state.json` のうちどのフィールドを更新するか明確に分担されています。
 この分担に従うことで、サーバ・フロント間で常に整合性の取れた状態を維持します。
@@ -453,8 +445,8 @@ title: 'REST API 仕様書'
     "history": [
 +     {
 +       "actor": "user",
-+       "word": "null",
-+       "image": "null"
++       "word": null,
++       "image": null
 +     }
     ]
   }
@@ -536,8 +528,8 @@ title: 'REST API 仕様書'
     "history": [
 +     {
 +       "actor": "ai",
-+       "word": "null",
-+       "image": "null"
++       "word": null,
++       "image": null
 +     }
     ]
   }
@@ -598,7 +590,7 @@ title: 'REST API 仕様書'
 
 ---
 
-## 6. TypeScript 型定義
+## 7. TypeScript 型定義
 
 以下は実装時に使える TypeScript の型定義です。
 
