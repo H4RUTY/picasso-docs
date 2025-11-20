@@ -16,6 +16,10 @@ title: 'REST API 仕様書'
   それで、GET /games/:gameId（state.json取得）、PATCH /games/:gameId を削除しました。
 </Callout>
 
+<Callout title="変更事項3" type="warn">
+  紙のスライドは一旦手動にしたので、APIは消しました。
+</Callout>
+
 <Callout title="当仕様書のファイル" type="success">
   [GitHub](https://github.com/H4RUTY/picasso-docs/blob/main/content/docs/developers/api-design.mdx?plain=1)
 </Callout>
@@ -123,8 +127,6 @@ title: 'REST API 仕様書'
 | メソッド | パス                            | 概要                                                             |
 | -------- | ------------------------------- | ---------------------------------------------------------------- |
 | POST     | `/games`                        | 新規ゲーム作成（gameId 発行、state.json 生成）                   |
-| POST     | `/games/:gameId/slide`          | ロール紙を指定長さ（mm）だけ送る（非同期。202 Accepted）         |
-| GET      | `/games/:gameId/slide/:jobId`   | ロール紙スライドジョブステータス取得                             |
 | POST     | `/games/:gameId/capture`        | Web カメラで撮影し turn-N.png を保存                             |
 | POST     | `/games/:gameId/turn/advance`   | ターンを次に進める                                               |
 | POST     | `/games/:gameId/ai/analyze`     | ユーザの画像解析 → 単語推測 → 勝敗判定                           |
@@ -163,57 +165,6 @@ state.json を初期値で生成。
 
 **レスポンス**
 `201 Created` ・ `state.json`
-
----
-
-### POST /games/:gameId/slide
-
-**説明**: ロール紙を指定長さだけ送る。処理は非同期。
-
-**リクエスト**
-
-```json
-{ "length": 100 }
-```
-
-**レスポンス**
-`202 Accepted`
-
-```json
-{
-  "status": "accepted",
-  "jobId": "job-20251007-192416-slide-100",
-  "message": "Sliding started."
-}
-```
-
-**注意**: ハードウェア通信エラーは `503` を返す。
-
----
-
-### GET /games/:gameId/slide/:jobId
-
-**説明**: スライドジョブのステータス取得
-
-**レスポンス**
-
-```json
-{
-  "jobId": "job-20251007-192416-slide-100",
-  "status": "sliding"
-}
-```
-
-<Callout title="statusの内容" type="info">
-  `pending` : 待ち
-
-`sliding` ロール紙スライド中
-
-`done` : 全工程が完了
-
-`error` : いずれかの工程で失敗
-
-</Callout>
 
 ---
 
@@ -620,23 +571,6 @@ export interface CreateGameRequest {
   firstActor: Actor;
 }
 export type CreateGameResponse = GameState;
-
-// POST /games/{gameId}/slide
-export interface SlideRequest {
-  length: number; // mm
-}
-export interface SlideResponse {
-  status: 'accepted' | 'error';
-  jobId?: string;
-  message?: string;
-}
-
-// GET /games/{gameId}/slide/{jobId}
-export type SlideJobStatus = 'pending' | 'sliding' | 'done' | 'error';
-export interface SlideJobResponse {
-  jobId: string;
-  status: SlideJobStatus;
-}
 
 // POST /games/{gameId}/capture
 export type CaptureResponse = GameState;
