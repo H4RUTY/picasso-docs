@@ -4,6 +4,7 @@ title: 'REST API 仕様書'
 
 <br />
 
+
 <Callout title="変更事項1" type="warn">
   1のディレクトリ構成ですが、games/index.jsonを設けました。
   このindex.jsonには、今までのゲームIDを格納します。 これにより、GET
@@ -11,31 +12,13 @@ title: 'REST API 仕様書'
 </Callout>
 
 <Callout title="変更事項2" type="warn">
-  バックエンドには、games/ディレクトリを静的配信してもらって、フロントから読みにいくので、
-  GET /games/:gameId（state.json取得）、PATCH /games/:gameId を削除しました。
+  バックエンドには、games/ディレクトリを静的配信してもらって、state.jsonをフロントから参照するのがシンプルだと思われます。
+  それで、GET /games/:gameId（state.json取得）、PATCH /games/:gameId を削除しました。
 </Callout>
 
 <Callout title="当仕様書のファイル" type="success">
-  [この仕様書のファイル](https://github.com/H4RUTY/picasso-docs/blob/main/content/docs/developers/api-design.mdx?plain=1)
-  👈 Click This!!
+  [GitHub](https://github.com/H4RUTY/picasso-docs/blob/main/content/docs/developers/api-design.mdx?plain=1)
 </Callout>
-
----
-
-## 0. 設計思想
-
-本 API は「**state.json を唯一の真実（Single Source of Truth）とする**」ことを基本方針とします。
-すべての状態はこのファイルを通じて管理・共有され、サーバ・クライアント間で一貫して扱われます。
-なお、展示環境向けのローカル操作のため、API 認証は不要です。
-
-- **状態の一元管理**
-
-  - ゲームの状態はすべて `state.json` に集約し、サーバが正として扱う。
-  - 更新系 API（`capture`, `analyze`, `next`, `advance`, `end`など）は、更新後の `state.json` 全体を返す。
-
-- **フロントエンドとの関係**
-  - フロントは `state.json` のコピーを保持し、UI 表示用に随時更新する。
-  - API 呼び出し後、返却された最新の `state.json` を反映して同期を保ち、サーバと同一の状態を再現する。
 
 ---
 
@@ -67,6 +50,7 @@ title: 'REST API 仕様書'
 
 - `gameId` は `YYYYMMDD-HHMMSS` 形式。
 - `games/:gameId/state.json` がそのゲームの SOT（source of truth）。
+- Express も Vite も `games/` を静的ディレクトリとして配信する。
 
 ---
 
@@ -84,6 +68,8 @@ title: 'REST API 仕様書'
 ]
 ```
 
+これをフロントが直接 fetch して履歴一覧を表示。
+
 ## 3. state.json フォーマット
 
 ### フィールド
@@ -91,7 +77,7 @@ title: 'REST API 仕様書'
 - `gameId` (string)
 - `firstActor` ("user" | "ai")
 - `turn` (integer) — 最新ターン番号
-- `status` ("created" | "playing" | "finished" | "aborted")
+- `status` ("playing" | "finished" | "aborted")
 - `result` ("ai-win" | "user-win" | "draw" | null)
 - `history` (array of entries)
 
@@ -137,7 +123,6 @@ title: 'REST API 仕様書'
 | メソッド | パス                            | 概要                                                             |
 | -------- | ------------------------------- | ---------------------------------------------------------------- |
 | POST     | `/games`                        | 新規ゲーム作成（gameId 発行、state.json 生成）                   |
-| GET      | `/games/:gameId`                | ゲーム状態取得（state.json を返す）                              |
 | POST     | `/games/:gameId/slide`          | ロール紙を指定長さ（mm）だけ送る（非同期。202 Accepted）         |
 | GET      | `/games/:gameId/slide/:jobId`   | ロール紙スライドジョブステータス取得                             |
 | POST     | `/games/:gameId/capture`        | Web カメラで撮影し turn-N.png を保存                             |
@@ -155,7 +140,8 @@ title: 'REST API 仕様書'
 
 ### POST /games
 
-**説明**: 新規ゲームを作成する。
+**説明**: 新規ゲームを作成する。  
+state.json を初期値で生成。
 
 **リクエスト**
 
@@ -163,18 +149,20 @@ title: 'REST API 仕様書'
 { "firstActor": "user" }
 ```
 
+**初期state.json**
+```json
+{
+  "gameId": "20251120-213030",  # YYYYMMDD-HHMMSS
+  "firstActor": "user",         # user | ai
+  "turn": 0,
+  "status": "playing",
+  "result": null,
+  "history": []
+}
+```
+
 **レスポンス**
 `201 Created` ・ `state.json`
-
-**副作用**: `games/:gameId` ディレクトリと初期 `state.json` を作成。
-
----
-
-### GET /games/:gameId
-
-**説明**: `state.json` を返す。
-
-**レスポンス**: `200 OK` ・ `state.json`
 
 ---
 
@@ -248,7 +236,7 @@ title: 'REST API 仕様書'
 
 **リクエスト**
 
-なし（ボディ不要）
+なし
 
 **レスポンス**
 `200 OK` ・ `state.json`
@@ -258,18 +246,20 @@ title: 'REST API 仕様書'
 1. turn をインクリメントする。
 2. history[] に新たなエントリを追加する。（ `word`, `image` は null）
 
-   ```json
-   // 例
-
-   "history": [
-    ...,
+```json
+{
+  "gameId": "20251007-192416",
+  "turn": 1,
+  "history": [
     {
       "actor": "user",
       "word": null,
       "image": null
     }
-   ]
-   ```
+  ]
+}
+  
+```
 
 ---
 
@@ -603,7 +593,7 @@ title: 'REST API 仕様書'
 // =================
 
 export type Actor = 'user' | 'ai';
-export type GameStatus = 'created' | 'playing' | 'finished' | 'aborted';
+export type GameStatus = 'playing' | 'finished' | 'aborted';
 export type GameResult = 'ai-win' | 'user-win' | 'draw' | null;
 
 export interface HistoryEntry {
@@ -630,23 +620,6 @@ export interface CreateGameRequest {
   firstActor: Actor;
 }
 export type CreateGameResponse = GameState;
-
-// GET /games (一覧の各要素)
-export interface GamesListItem {
-  gameId: string;
-  result: GameResult;
-}
-
-// GET /games/:gameId
-export type GetGameStateResponse = GameState;
-
-// PATCH /games/:gameId
-export interface PatchGameRequest {
-  status?: GameStatus;
-  result?: GameResult;
-  // 他のフィールドも部分更新可能にする場合は追加
-}
-export type PatchGameResponse = GameState;
 
 // POST /games/{gameId}/slide
 export interface SlideRequest {
