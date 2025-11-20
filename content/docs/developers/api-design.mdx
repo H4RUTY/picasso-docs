@@ -32,23 +32,26 @@ title: 'REST API 仕様書'
 ## 1. ディレクトリ構成
 
 ```text
-/app-root
- ├─ games/
- │   ├─ 20251007-192416/           # gameId = YYYYMMDD-HHMMSS
- │   │   ├─ state.json
- │   │   ├─ turn-1.png
- │   │   ├─ turn-2.png
- │   │   ├─ svg/
- │   │   │  ├─ turn-2.svg
- │   │   │  └─ turn-4.svg
- │   │   └─ gcode/
- │   │      ├─ turn-2.gcode
- │   │      └─ turn-4.gcode
- │   └─ 20251008-103029/
- │       └─ ...
- ├─ uploads/                       # （任意）一時保存用
- ├─ logs/
- └─ config/
+ project-root/
+  ├─ backend/
+  │   ├─ src/
+  │   └─ games/
+  │       ├─ 20251007-192416/ # gameId = YYYYMMDD-HHMMSS
+  │       │   ├─ state.json
+  │       │   ├─ turn-1.png
+  │       │   ├─ turn-2.png
+  │       │   ├─ svg/
+  │       │   │  ├─ turn-2.svg
+  │       │   │  └─ turn-4.svg 
+  │       │   └─ gcode/
+  │       │      ├─ turn-2.svg
+  │       │      └─ turn-4.svg
+  │       └─ 20251008-103029/
+  ├─ frontend/
+  │   ├─ index.html
+  │   ├─ src/
+  │   └─ dist/   ← vite build の成果物
+  └─ package.json
 ```
 
 - `gameId` は `YYYYMMDD-HHMMSS` 形式。
